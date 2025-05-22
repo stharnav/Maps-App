@@ -36,8 +36,10 @@ dependencies {
 
     implementation(libs.appcompat)
     implementation(libs.material)
+    implementation(libs.volley)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation(libs.osmdroid)
+    implementation ("com.google.android.gms:play-services-location:21.0.1")
 }

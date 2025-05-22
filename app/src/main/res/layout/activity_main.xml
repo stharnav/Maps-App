@@ -1,13 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
+    android:layout_marginTop="110dp"
     android:layout_height="match_parent">
 
     <org.osmdroid.views.MapView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/map">
+        android:layout_height="700dp"
+        android:id="@+id/map"
+        titlesource="Mapnik">
     </org.osmdroid.views.MapView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="5dp"
+        android:layout_margin="5dp"
+        android:elevation="5px"
+        android:id="@+id/informationCard">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Kathmandu"
+                android:padding="5dp"
+                android:textSize="24sp"
+                android:textStyle="bold">
+            </TextView>
+
+            <TextView
+                android:id="@+id/displayName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="Kathmandu"
+                android:textSize="14sp">
+            </TextView>
+        </LinearLayout>
+
+
+    </com.google.android.material.card.MaterialCardView>
 
 </LinearLayout>
