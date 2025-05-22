@@ -3,10 +3,13 @@ package com.example.maps;
 import static java.lang.Double.parseDouble;
 
 import android.content.Context;
+
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
+import android.Manifest;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,21 +17,24 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.JsonObjectRequest;
+
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,9 +46,6 @@ import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     private MapView map = null;
@@ -55,6 +58,9 @@ public class MainActivity extends AppCompatActivity {
 
     private ImageButton closeButton;
     private MaterialCardView infoCard;
+    private static final int REQUEST_FINE_LOCATION = 100;
+    private FusedLocationProviderClient fusedLocationClient;
+    private FloatingActionButton myLocation;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -65,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
         displayName = findViewById(R.id.displayName);
         closeButton = findViewById(R.id.closeButton);
         infoCard = findViewById(R.id.informationCard);
+        myLocation = findViewById(R.id.gps);
 
         Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
@@ -87,7 +94,20 @@ public class MainActivity extends AppCompatActivity {
             infoCard.setVisibility(View.GONE);
         });
 
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
+        myLocation.setOnClickListener(V->{
+            checkLocationPermission();
+        });
+
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    100);  // 100 is requestCode
+        }
     }
 
     @Override
@@ -101,12 +121,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 // Trigger search
-
                 search(query);
-
                 return true;
             }
-
             @Override
             public boolean onQueryTextChange(String newText) {
                 // Handle live changes if needed
@@ -169,4 +186,56 @@ public class MainActivity extends AppCompatActivity {
 
         requestQueue.add(request);
     }
+
+    private void checkLocationPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQUEST_FINE_LOCATION);
+        } else {
+            getCurrentLocation();
+        }
+    }
+
+    private void getCurrentLocation() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        if (location != null) {
+                            double latitude = location.getLatitude();
+                            double longitude = location.getLongitude();
+                            startPoint = new GeoPoint(latitude, longitude);
+                            //mapController.zoomTo();
+                            mapController.animateTo(startPoint);
+                        } else {
+                            Toast.makeText(MainActivity.this,
+                                    "Location not available", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == REQUEST_FINE_LOCATION) {
+            if (grantResults.length > 0 &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                getCurrentLocation();
+            } else {
+                Toast.makeText(this, "Location permission denied", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
 }
