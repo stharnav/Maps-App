@@ -6,47 +6,122 @@
     android:layout_marginTop="110dp"
     android:layout_height="match_parent">
 
-    <org.osmdroid.views.MapView
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="700dp"
-        android:id="@+id/map"
-        titlesource="Mapnik">
-    </org.osmdroid.views.MapView>
+        android:layout_height="match_parent">
 
-    <com.google.android.material.card.MaterialCardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardCornerRadius="5dp"
-        android:layout_margin="5dp"
-        android:elevation="5px"
-        android:id="@+id/informationCard">
-
+        <!-- Bottom container -->
         <LinearLayout
+            android:id="@+id/background_container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:background="#CCCCCC"
             android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/name"
+            <org.osmdroid.views.MapView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Kathmandu"
-                android:padding="5dp"
-                android:textSize="24sp"
-                android:textStyle="bold">
-            </TextView>
-
-            <TextView
-                android:id="@+id/displayName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="5dp"
-                android:text="Kathmandu"
-                android:textSize="14sp">
-            </TextView>
+                android:layout_height="match_parent"
+                android:id="@+id/map"
+                titlesource="Mapnik">
+            </org.osmdroid.views.MapView>
         </LinearLayout>
 
 
-    </com.google.android.material.card.MaterialCardView>
+        <!-- Top container (on top of background_container) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:gravity="end">
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_marginBottom="300dp"
+                android:layout_gravity="bottom"
+                android:foregroundGravity="bottom"
+                android:layout_height="wrap_content">
+
+            </com.google.android.material.floatingactionbutton.FloatingActionButton>
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_marginBottom="300dp"
+                android:layout_gravity="bottom"
+                android:foregroundGravity="bottom"
+                android:layout_height="wrap_content">
+
+            </com.google.android.material.floatingactionbutton.FloatingActionButton>
+        </LinearLayout>
+        <RelativeLayout
+            android:id="@+id/top_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="40dp">
+
+            <com.google.android.material.card.MaterialCardView
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="10sp"
+                android:layout_margin="5dp"
+                android:elevation="5px"
+                android:id="@+id/informationCard">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Kathmandu"
+                        android:padding="5dp"
+                        android:textSize="24sp"
+                        android:textStyle="bold">
+                    </TextView>
+
+                    <TextView
+                        android:id="@+id/displayName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:text="Kathmandu"
+                        android:textSize="14sp">
+                    </TextView>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:text="Class"
+                            android:id="@+id/landmarkTlass">
+                        </TextView>
+                        <TextView
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:text="Type"
+                            android:id="@+id/landmarkType">
+                        </TextView>
+                        <ImageButton
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@color/black"
+                            android:id="@+id/closeButton">
+                        </ImageButton>
+                    </LinearLayout>
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+        </RelativeLayout>
+    </FrameLayout>
+
+
+
+
 
 </LinearLayout>

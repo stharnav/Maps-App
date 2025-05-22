@@ -9,6 +9,8 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +28,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.material.card.MaterialCardView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -50,6 +53,9 @@ public class MainActivity extends AppCompatActivity {
     private TextView name;
     private TextView displayName;
 
+    private ImageButton closeButton;
+    private MaterialCardView infoCard;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,6 +63,8 @@ public class MainActivity extends AppCompatActivity {
 
         name = findViewById(R.id.name);
         displayName = findViewById(R.id.displayName);
+        closeButton = findViewById(R.id.closeButton);
+        infoCard = findViewById(R.id.informationCard);
 
         Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
@@ -73,6 +81,11 @@ public class MainActivity extends AppCompatActivity {
         mapController.setZoom(5);
         startPoint = new GeoPoint(0, 0);
         mapController.setCenter(startPoint);
+
+
+        closeButton.setOnClickListener(V->{
+            infoCard.setVisibility(View.GONE);
+        });
 
 
     }
@@ -113,6 +126,8 @@ public class MainActivity extends AppCompatActivity {
                     public void onResponse(JSONArray response) {
                         if (response.length() > 0) {
                             try {
+                                infoCard.setVisibility(View.VISIBLE);
+
                                 JSONObject location = response.getJSONObject(0);
                                 JSONArray boundingBox = location.getJSONArray("boundingbox");
 
