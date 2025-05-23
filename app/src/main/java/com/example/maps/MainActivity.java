@@ -41,10 +41,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
+import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.util.MapTileIndex;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Marker;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -61,21 +64,28 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_FINE_LOCATION = 100;
     private FusedLocationProviderClient fusedLocationClient;
     private FloatingActionButton myLocation;
+    private FloatingActionButton mapStyle;
+    private Marker userMarker;
+    private Marker placeMarker;
+    boolean Mapnik = true;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //set id
         name = findViewById(R.id.name);
         displayName = findViewById(R.id.displayName);
         closeButton = findViewById(R.id.closeButton);
         infoCard = findViewById(R.id.informationCard);
         myLocation = findViewById(R.id.gps);
+        mapStyle = findViewById(R.id.mapStyle);
 
         Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
 
+        //setup maps
         requestQueue = Volley.newRequestQueue(this);
 
         map = (MapView) findViewById(R.id.map);
@@ -89,6 +99,20 @@ public class MainActivity extends AppCompatActivity {
         startPoint = new GeoPoint(0, 0);
         mapController.setCenter(startPoint);
 
+        //
+        userMarker = new Marker(map);
+        userMarker.setTitle("You are here");
+        userMarker.setIcon(getResources().getDrawable(R.drawable.location_pin));
+        userMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+
+        placeMarker = new Marker(map);
+        placeMarker.setIcon(getResources().getDrawable(R.drawable.pin));
+        placeMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+
+
+        mapStyle.setOnClickListener(V->{
+            changeMapStyle();
+        });
 
         closeButton.setOnClickListener(V->{
             infoCard.setVisibility(View.GONE);
@@ -161,8 +185,16 @@ public class MainActivity extends AppCompatActivity {
                                 BoundingBox box = new BoundingBox(north, east, south, west);
 
 
+
+                                GeoPoint newPoint = new GeoPoint(lat, lon);
+                                map.getOverlays().add(placeMarker);
+                                placeMarker.setPosition(newPoint);
+                                placeMarker.setTitle(nameA);
+                                placeMarker.setSnippet("Lat: " + lat + "\nLon: " + lon);
+                                map.invalidate();
+
                                 startPoint = new GeoPoint(lat, lon);
-                                //mapController.zoomTo();
+                                mapController.setZoom(5);
                                 mapController.animateTo(startPoint);
 
                                 name.setText(nameA);
@@ -214,6 +246,13 @@ public class MainActivity extends AppCompatActivity {
                             double longitude = location.getLongitude();
                             startPoint = new GeoPoint(latitude, longitude);
                             //mapController.zoomTo();
+                            GeoPoint newPoint = new GeoPoint(latitude, longitude);
+                            // Move marker
+
+                            map.getOverlays().add(userMarker);
+                            userMarker.setPosition(newPoint);
+                            userMarker.setSnippet("Lat: " + latitude + "\nLon: " + longitude);
+                            map.invalidate();
                             mapController.animateTo(startPoint);
                         } else {
                             Toast.makeText(MainActivity.this,
@@ -236,6 +275,31 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Location permission denied", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    public void changeMapStyle(){
+        //setup map style
+        if(Mapnik){
+            OnlineTileSourceBase tileSource = new OnlineTileSourceBase("OpenTopoMap", 0, 18, 256, ".png",
+                    new String[] { "https://a.tile.opentopomap.org/" }) {
+                @Override
+                public String getTileURLString(long pMapTileIndex) {
+                    return getBaseUrl()
+                            + MapTileIndex.getZoom(pMapTileIndex) + "/"
+                            + MapTileIndex.getX(pMapTileIndex) + "/"
+                            + MapTileIndex.getY(pMapTileIndex) + mImageFilenameEnding;
+                }
+            };
+            Mapnik = false;
+            map.setTileSource(tileSource);
+        }else{
+            // Switch back to OSM Mapnik
+            map.setTileSource(TileSourceFactory.MAPNIK);
+            Mapnik = true;
+        }
+
+
+
     }
 
 }

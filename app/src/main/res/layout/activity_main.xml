@@ -33,6 +33,15 @@
             android:layout_margin="10dp"
             android:gravity="end"
             android:layout_height="wrap_content">
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:id="@+id/mapStyle"
+                android:src="@drawable/map"
+                android:layout_height="wrap_content">
+            </com.google.android.material.floatingactionbutton.FloatingActionButton>
+
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:layout_width="wrap_content"
                 android:layout_marginBottom="20dp"
@@ -41,12 +50,6 @@
                 android:src="@drawable/gps">
             </com.google.android.material.floatingactionbutton.FloatingActionButton>
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:layout_width="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:layout_height="wrap_content">
-
-            </com.google.android.material.floatingactionbutton.FloatingActionButton>
         </LinearLayout>
         <RelativeLayout
             android:id="@+id/top_container"
