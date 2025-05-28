@@ -1,9 +1,11 @@
 package com.example.maps;
 
+import static com.example.maps.MapStyle.*;
 import static java.lang.Double.parseDouble;
 
 import android.content.Context;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -49,6 +51,8 @@ import org.osmdroid.util.MapTileIndex;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 
+import java.util.Map;
+
 
 public class MainActivity extends AppCompatActivity {
     private MapView map = null;
@@ -65,9 +69,11 @@ public class MainActivity extends AppCompatActivity {
     private FusedLocationProviderClient fusedLocationClient;
     private FloatingActionButton myLocation;
     private FloatingActionButton mapStyle;
+    private FloatingActionButton guideButton;
     private Marker userMarker;
     private Marker placeMarker;
     boolean Mapnik = true;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -81,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
         infoCard = findViewById(R.id.informationCard);
         myLocation = findViewById(R.id.gps);
         mapStyle = findViewById(R.id.mapStyle);
+        guideButton = findViewById(R.id.guide);
 
         Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
@@ -111,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         mapStyle.setOnClickListener(V->{
-            changeMapStyle();
+            Mapnik = MapStyle.changeMapStyle(Mapnik, map);
         });
 
         closeButton.setOnClickListener(V->{
@@ -122,6 +129,11 @@ public class MainActivity extends AppCompatActivity {
 
         myLocation.setOnClickListener(V->{
             checkLocationPermission();
+        });
+
+        guideButton.setOnClickListener(V->{
+            Intent g = new Intent(MainActivity.this, GuideActivity.class);
+            startActivity(g);
         });
 
 
@@ -194,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
                                 map.invalidate();
 
                                 startPoint = new GeoPoint(lat, lon);
-                                mapController.setZoom(5);
+                                //mapController.setZoom(5);
                                 mapController.animateTo(startPoint);
 
                                 name.setText(nameA);
@@ -277,29 +289,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void changeMapStyle(){
-        //setup map style
-        if(Mapnik){
-            OnlineTileSourceBase tileSource = new OnlineTileSourceBase("OpenTopoMap", 0, 18, 256, ".png",
-                    new String[] { "https://a.tile.opentopomap.org/" }) {
-                @Override
-                public String getTileURLString(long pMapTileIndex) {
-                    return getBaseUrl()
-                            + MapTileIndex.getZoom(pMapTileIndex) + "/"
-                            + MapTileIndex.getX(pMapTileIndex) + "/"
-                            + MapTileIndex.getY(pMapTileIndex) + mImageFilenameEnding;
-                }
-            };
-            Mapnik = false;
-            map.setTileSource(tileSource);
-        }else{
-            // Switch back to OSM Mapnik
-            map.setTileSource(TileSourceFactory.MAPNIK);
-            Mapnik = true;
-        }
 
-
-
-    }
 
 }
